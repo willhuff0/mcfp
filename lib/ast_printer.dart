@@ -1,4 +1,4 @@
-import 'package:mcfp_compiler/ast.dart';
+import 'package:mcfp_compiler/ast_expr.dart';
 
 class AstPrinter implements Visitor<String> {
   String print(Expr expr) {

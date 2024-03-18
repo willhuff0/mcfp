@@ -1,4 +1,5 @@
-import 'package:mcfp_compiler/ast.dart';
+import 'package:mcfp_compiler/ast_expr.dart';
+import 'package:mcfp_compiler/ast_stmt.dart';
 import 'package:mcfp_compiler/lexer.dart';
 
 class ParseError implements Exception {}
@@ -9,13 +10,36 @@ class Parser {
 
   Parser(this._tokens);
 
-  Expr? parse() {
-    try {
-      return _expression();
-    } on ParseError {
-      return null;
+  List<Stmt> parse() {
+    final statements = <Stmt>[];
+    while (!_isAtEnd()) {
+      statements.add(_statement());
     }
+
+    return statements;
   }
+
+  // Statements
+
+  Stmt _statement() {
+    if (_match(TokenType.PRINT)) return _printStatement();
+
+    return _expressionStatement();
+  }
+
+  Stmt _printStatement() {
+    final value = _expression();
+    _consume(TokenType.SEMICOLON, 'Expect \';\' after value.');
+    return Print(value);
+  }
+
+  Stmt _expressionStatement() {
+    final expr = _expression();
+    _consume(TokenType.SEMICOLON, 'Expect \';\' after expression.');
+    return Expression(expr);
+  }
+
+  // Expressions
 
   Expr _expression() {
     return _equality();
@@ -24,7 +48,7 @@ class Parser {
   Expr _equality() {
     var expr = _comparison();
 
-    while (_match([TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL])) {
+    while (_matchAny([TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL])) {
       final operator = _previous();
       final right = _comparison();
       expr = Binary(expr, operator, right);
@@ -36,7 +60,7 @@ class Parser {
   Expr _comparison() {
     var expr = _term();
 
-    while (_match([TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL])) {
+    while (_matchAny([TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL])) {
       final operator = _previous();
       final right = _term();
       expr = Binary(expr, operator, right);
@@ -48,7 +72,7 @@ class Parser {
   Expr _term() {
     var expr = _factor();
 
-    while (_match([TokenType.MINUS, TokenType.PLUS])) {
+    while (_matchAny([TokenType.MINUS, TokenType.PLUS])) {
       final operator = _previous();
       final right = _factor();
       expr = Binary(expr, operator, right);
@@ -60,7 +84,7 @@ class Parser {
   Expr _factor() {
     var expr = _unary();
 
-    while (_match([TokenType.SLASH, TokenType.STAR])) {
+    while (_matchAny([TokenType.SLASH, TokenType.STAR])) {
       final operator = _previous();
       final right = _unary();
       expr = Binary(expr, operator, right);
@@ -70,7 +94,7 @@ class Parser {
   }
 
   Expr _unary() {
-    if (_match([TokenType.BANG, TokenType.MINUS])) {
+    if (_matchAny([TokenType.BANG, TokenType.MINUS])) {
       final operator = _previous();
       final right = _unary();
       return Unary(operator, right);
@@ -80,15 +104,15 @@ class Parser {
   }
 
   Expr _primary() {
-    if (_match([TokenType.FALSE])) return Literal(false);
-    if (_match([TokenType.TRUE])) return Literal(true);
-    if (_match([TokenType.NULL])) return Literal(null);
+    if (_match(TokenType.FALSE)) return Literal(false);
+    if (_match(TokenType.TRUE)) return Literal(true);
+    if (_match(TokenType.NULL)) return Literal(null);
 
-    if (_match([TokenType.NUMBER, TokenType.STRING])) {
+    if (_matchAny([TokenType.NUMBER, TokenType.STRING])) {
       return Literal(_previous().literal);
     }
 
-    if (_match([TokenType.LEFT_PAREN])) {
+    if (_match(TokenType.LEFT_PAREN)) {
       final expr = _expression();
       _consume(TokenType.RIGHT_PAREN, 'Expect \')\' after expression.');
       return Grouping(expr);
@@ -132,7 +156,16 @@ class Parser {
     }
   }
 
-  bool _match(List<TokenType> types) {
+  bool _match(TokenType type) {
+    if (_check(type)) {
+      _advance();
+      return true;
+    }
+
+    return false;
+  }
+
+  bool _matchAny(List<TokenType> types) {
     for (final type in types) {
       if (_check(type)) {
         _advance();

@@ -1,21 +1,3 @@
-123 + 1 * (123 - 12893)
-
-// func load() {
-//     var before = 0;
-
-//     junk();
-
-//     var after = 0;
-// }
-
-// func junk() {
-//     var bruh = 4;
-    
-//     var test = bruh + 9;
-    
-//     var bruh3;
-    
-//     var jit = true;
-    
-//     var mathTestBruh = (bruh + bruh3) * (test - 12) / (122 * 2);
-// }
+print 'test';
+print true;
+print 2 + 2 * 10;

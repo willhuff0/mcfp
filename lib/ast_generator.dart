@@ -1,21 +1,36 @@
 import 'dart:io';
 
+void main() async {
+  await AstGenerator().run();
+}
+
 class AstGenerator {
   Future<void> run() async {
-    await _defineAst('lib/ast.dart', 'Expr', [
+    await _defineAst('lib/ast_expr.dart', 'Expr', [
+      'package:mcfp_compiler/lexer.dart',
+    ], [
       'Binary   : Expr left, Token operator, Expr right',
       'Grouping : Expr expression',
       'Literal  : Object? value',
       'Unary    : Token operator, Expr right',
     ]);
+
+    await _defineAst('lib/ast_stmt.dart', 'Stmt', [
+      'package:mcfp_compiler/ast_expr.dart',
+    ], [
+      'Expression : Expr expression',
+      'Print      : Expr expression',
+    ]);
   }
 
-  Future<void> _defineAst(String outFile, String baseName, List<String> types) async {
+  Future<void> _defineAst(String outFile, String baseName, List<String> imports, List<String> types) async {
     final file = File(outFile);
     await file.create(recursive: true);
     final writer = file.openWrite();
 
-    writer.writeln("import 'package:mcfp_compiler/lexer.dart';");
+    for (final import in imports) {
+      writer.writeln("import '$import';");
+    }
     writer.writeln();
     writer.writeln("abstract class $baseName {");
     writer.writeln('  R accept<R>(Visitor<R> visitor);');

@@ -1,13 +1,36 @@
-import 'package:mcfp_compiler/ast.dart';
+import 'package:mcfp_compiler/ast_expr.dart' as ast_expr;
+import 'package:mcfp_compiler/ast_stmt.dart' as ast_stmt;
 import 'package:mcfp_compiler/lexer.dart';
 
-class Interpreter implements Visitor<Object?> {
-  void interpret(Expr expression) {
-    print(_evaluate(expression));
+class Interpreter implements ast_expr.Visitor<Object?>, ast_stmt.Visitor<void> {
+  void interpret(List<ast_stmt.Stmt> statements) {
+    // try catch runtime errors
+    for (final statement in statements) {
+      _execute(statement);
+    }
+  }
+
+// Statements
+
+  @override
+  void visitExpressionStmt(ast_stmt.Expression stmt) {
+    _evaluate(stmt.expression);
   }
 
   @override
-  Object? visitBinaryExpr(Binary expr) {
+  void visitPrintStmt(ast_stmt.Print stmt) {
+    final value = _evaluate(stmt.expression);
+    print(value);
+  }
+
+  void _execute(ast_stmt.Stmt stmt) {
+    stmt.accept(this);
+  }
+
+  // Expressions
+
+  @override
+  Object? visitBinaryExpr(ast_expr.Binary expr) {
     final left = _evaluate(expr.left);
     final right = _evaluate(expr.right);
 
@@ -46,17 +69,17 @@ class Interpreter implements Visitor<Object?> {
   }
 
   @override
-  Object? visitGroupingExpr(Grouping expr) {
+  Object? visitGroupingExpr(ast_expr.Grouping expr) {
     return _evaluate(expr.expression);
   }
 
   @override
-  Object? visitLiteralExpr(Literal expr) {
+  Object? visitLiteralExpr(ast_expr.Literal expr) {
     return expr.value;
   }
 
   @override
-  Object? visitUnaryExpr(Unary expr) {
+  Object? visitUnaryExpr(ast_expr.Unary expr) {
     final right = _evaluate(expr.right);
 
     switch (expr.operator.type) {
@@ -71,7 +94,7 @@ class Interpreter implements Visitor<Object?> {
     return null;
   }
 
-  Object? _evaluate(Expr expr) {
+  Object? _evaluate(ast_expr.Expr expr) {
     return expr.accept(this);
   }
 
