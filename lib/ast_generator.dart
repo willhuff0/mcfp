@@ -9,17 +9,25 @@ class AstGenerator {
     await _defineAst('lib/ast_expr.dart', 'Expr', [
       'package:mcfp_compiler/lexer.dart',
     ], [
+      'Assign   : Token name, Expr value',
       'Binary   : Expr left, Token operator, Expr right',
       'Grouping : Expr expression',
       'Literal  : Object? value',
+      'Logical  : Expr left, Token operator, Expr right',
       'Unary    : Token operator, Expr right',
+      'Variable : Token name',
     ]);
 
     await _defineAst('lib/ast_stmt.dart', 'Stmt', [
+      'package:mcfp_compiler/lexer.dart',
       'package:mcfp_compiler/ast_expr.dart',
     ], [
+      'Block      : List<Stmt> statements',
       'Expression : Expr expression',
+      'If         : Expr condition, Stmt thenBranch, Stmt? elseBranch',
       'Print      : Expr expression',
+      'Var        : Token name, Expr? initializer',
+      'While      : Expr condition, Stmt body',
     ]);
   }
 

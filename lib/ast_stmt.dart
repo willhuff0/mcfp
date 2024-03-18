@@ -1,3 +1,4 @@
+import 'package:mcfp_compiler/lexer.dart';
 import 'package:mcfp_compiler/ast_expr.dart';
 
 abstract class Stmt {
@@ -5,8 +6,23 @@ abstract class Stmt {
 }
 
 abstract interface class Visitor<R> {
+  R visitBlockStmt(Block stmt);
   R visitExpressionStmt(Expression stmt);
+  R visitIfStmt(If stmt);
   R visitPrintStmt(Print stmt);
+  R visitVarStmt(Var stmt);
+  R visitWhileStmt(While stmt);
+}
+
+class Block extends Stmt {
+  final List<Stmt> statements;
+
+  Block(this.statements);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitBlockStmt(this);
+  }
 }
 
 class Expression extends Stmt {
@@ -20,6 +36,19 @@ class Expression extends Stmt {
   }
 }
 
+class If extends Stmt {
+  final Expr condition;
+  final Stmt thenBranch;
+  final Stmt? elseBranch;
+
+  If(this.condition, this.thenBranch, this.elseBranch);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitIfStmt(this);
+  }
+}
+
 class Print extends Stmt {
   final Expr expression;
 
@@ -28,6 +57,30 @@ class Print extends Stmt {
   @override
   R accept<R>(Visitor<R> visitor) {
     return visitor.visitPrintStmt(this);
+  }
+}
+
+class Var extends Stmt {
+  final Token name;
+  final Expr? initializer;
+
+  Var(this.name, this.initializer);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitVarStmt(this);
+  }
+}
+
+class While extends Stmt {
+  final Expr condition;
+  final Stmt body;
+
+  While(this.condition, this.body);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitWhileStmt(this);
   }
 }
 

@@ -237,13 +237,13 @@ class Scanner {
       _advance();
     }
 
-    if (_peek() == '.' && _isDigit(_peekNext())) {
-      _advance();
+    // if (_peek() == '.' && _isDigit(_peekNext())) {
+    //   _advance();
 
-      while (_isDigit(_peek())) {
-        _advance();
-      }
-    }
+    //   while (_isDigit(_peek())) {
+    //     _advance();
+    //   }
+    // }
 
     final value = int.parse(_source.substring(_start, _current));
     _addTokenWithLiteral(TokenType.NUMBER, value);
