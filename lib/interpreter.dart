@@ -3,7 +3,14 @@ import 'package:mcfp_compiler/ast_stmt.dart' as ast_stmt;
 import 'package:mcfp_compiler/lexer.dart';
 
 class Interpreter implements ast_expr.Visitor<Object?>, ast_stmt.Visitor<void> {
-  var _environment = Environment(null);
+  final _globals = Environment(null);
+  late Environment _environment;
+
+  Interpreter() {
+    _environment = _globals;
+
+    _globals.define('clock', ClockCallable());
+  }
 
   void interpret(List<ast_stmt.Stmt> statements) {
     // try catch runtime errors
@@ -20,6 +27,12 @@ class Interpreter implements ast_expr.Visitor<Object?>, ast_stmt.Visitor<void> {
   }
 
   @override
+  void visitASTFunctionStmt(ast_stmt.ASTFunction stmt) {
+    final function = MCFPFunction(stmt, _environment);
+    _environment.define(stmt.name.lexeme, function);
+  }
+
+  @override
   void visitIfStmt(ast_stmt.If stmt) {
     if (_isTruthy(_evaluate(stmt.condition))) {
       _execute(stmt.thenBranch);
@@ -32,6 +45,14 @@ class Interpreter implements ast_expr.Visitor<Object?>, ast_stmt.Visitor<void> {
   void visitPrintStmt(ast_stmt.Print stmt) {
     final value = _evaluate(stmt.expression);
     print(value);
+  }
+
+  @override
+  void visitReturnStmt(ast_stmt.Return stmt) {
+    Object? value;
+    if (stmt.value != null) value = _evaluate(stmt.value!);
+
+    throw Return(value);
   }
 
   @override
@@ -113,6 +134,25 @@ class Interpreter implements ast_expr.Visitor<Object?>, ast_stmt.Visitor<void> {
     }
 
     return null;
+  }
+
+  @override
+  Object? visitCallExpr(ast_expr.Call expr) {
+    final callee = _evaluate(expr.callee);
+
+    final arguments = <Object?>[];
+    for (final argument in expr.arguments) {
+      arguments.add(_evaluate(argument));
+    }
+
+    if (callee is Callable) {
+      if (arguments.length != callee.arity()) {
+        throw Exception('Expected ${callee.arity()} arguments but got ${arguments.length}.');
+      }
+      return callee.call(this, arguments);
+    } else {
+      throw Exception('Can only call functions and classes.');
+    }
   }
 
   @override
@@ -218,4 +258,64 @@ class Environment {
 
     throw Exception('Variable ${name.lexeme} not defined.');
   }
+}
+
+abstract interface class Callable {
+  int arity();
+  Object? call(Interpreter interpreter, List<Object?> arguments);
+}
+
+class ClockCallable implements Callable {
+  @override
+  int arity() {
+    return 0;
+  }
+
+  @override
+  Object? call(Interpreter interpreter, List<Object?> arguments) {
+    return DateTime.now().millisecondsSinceEpoch;
+  }
+
+  @override
+  String toString() {
+    return '<native fn>';
+  }
+}
+
+class MCFPFunction implements Callable {
+  final ast_stmt.ASTFunction _declaration;
+  final Environment _closure;
+
+  MCFPFunction(this._declaration, this._closure);
+
+  @override
+  int arity() {
+    return _declaration.params.length;
+  }
+
+  @override
+  Object? call(Interpreter interpreter, List<Object?> arguments) {
+    final environment = Environment(_closure);
+    for (var i = 0; i < _declaration.params.length; i++) {
+      environment.define(_declaration.params[i].lexeme, arguments[i]);
+    }
+
+    try {
+      interpreter._executeBlock(_declaration.body, environment);
+    } on Return catch (returnValue) {
+      return returnValue.value;
+    }
+    return null;
+  }
+
+  @override
+  String toString() {
+    return '<fn ${_declaration.name.lexeme}>';
+  }
+}
+
+class Return {
+  final Object? value;
+
+  Return(this.value);
 }
