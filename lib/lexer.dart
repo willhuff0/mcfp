@@ -49,9 +49,9 @@ enum TokenType {
 
   EOF('');
 
-  final String regExp;
+  final String mcLexeme;
 
-  const TokenType(this.regExp);
+  const TokenType(this.mcLexeme);
 }
 
 class Token {

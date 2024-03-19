@@ -19,7 +19,7 @@ class Interpreter implements ast_expr.Visitor<Object?>, ast_stmt.Visitor<void> {
     }
   }
 
-// Statements
+  // Statements
 
   @override
   void visitExpressionStmt(ast_stmt.Expression stmt) {
