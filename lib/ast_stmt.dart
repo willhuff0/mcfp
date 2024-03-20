@@ -1,5 +1,5 @@
-import 'package:mcfp_compiler/lexer.dart';
-import 'package:mcfp_compiler/ast_expr.dart';
+import 'package:mcfp/lexer.dart';
+import 'package:mcfp/ast_expr.dart';
 
 abstract class Stmt {
   R accept<R>(Visitor<R> visitor);
@@ -12,8 +12,10 @@ abstract interface class Visitor<R> {
   R visitIfStmt(If stmt);
   R visitPrintStmt(Print stmt);
   R visitReturnStmt(Return stmt);
+  R visitBreakStmt(Break stmt);
   R visitVarStmt(Var stmt);
   R visitWhileStmt(While stmt);
+  R visitWhilePassStmt(WhilePass stmt);
 }
 
 class Block extends Stmt {
@@ -87,6 +89,17 @@ class Return extends Stmt {
   }
 }
 
+class Break extends Stmt {
+  final Token keyword;
+
+  Break(this.keyword);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitBreakStmt(this);
+  }
+}
+
 class Var extends Stmt {
   final Token name;
   final Expr? initializer;
@@ -110,3 +123,16 @@ class While extends Stmt {
     return visitor.visitWhileStmt(this);
   }
 }
+
+class WhilePass extends Stmt {
+  final Expr? condition;
+  final String funcName;
+
+  WhilePass(this.condition, this.funcName);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitWhilePassStmt(this);
+  }
+}
+

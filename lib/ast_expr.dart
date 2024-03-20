@@ -1,4 +1,4 @@
-import 'package:mcfp_compiler/lexer.dart';
+import 'package:mcfp/lexer.dart';
 
 abstract class Expr {
   R accept<R>(Visitor<R> visitor);

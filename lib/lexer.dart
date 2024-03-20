@@ -44,6 +44,7 @@ enum TokenType {
   NULL(''),
   PRINT(''),
   RETURN(''),
+  BREAK(''),
   VAR(''),
   WHILE(''),
 
@@ -72,11 +73,12 @@ const _keywords = {
   'false': TokenType.FALSE,
   'true': TokenType.TRUE,
   'func': TokenType.FUNC,
-  'for': TokenType.FOR,
+  //'for': TokenType.FOR,
   'if': TokenType.IF,
   'null': TokenType.NULL,
   'print': TokenType.PRINT,
   'return': TokenType.RETURN,
+  'break': TokenType.BREAK,
   'var': TokenType.VAR,
   'while': TokenType.WHILE,
 };

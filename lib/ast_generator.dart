@@ -7,7 +7,7 @@ void main() async {
 class AstGenerator {
   Future<void> run() async {
     await _defineAst('lib/ast_expr.dart', 'Expr', [
-      'package:mcfp_compiler/lexer.dart',
+      'package:mcfp/lexer.dart',
     ], [
       'Assign   : Token name, Expr value',
       'Binary   : Expr left, Token operator, Expr right',
@@ -20,17 +20,19 @@ class AstGenerator {
     ]);
 
     await _defineAst('lib/ast_stmt.dart', 'Stmt', [
-      'package:mcfp_compiler/lexer.dart',
-      'package:mcfp_compiler/ast_expr.dart',
+      'package:mcfp/lexer.dart',
+      'package:mcfp/ast_expr.dart',
     ], [
-      'Block        : List<Stmt> statements',
-      'Expression   : Expr expression',
+      'Block       : List<Stmt> statements',
+      'Expression  : Expr expression',
       'ASTFunction : Token name, List<Token> params, List<Stmt> body',
-      'If           : Expr condition, Stmt thenBranch, Stmt? elseBranch',
-      'Print        : Expr expression',
-      'Return       : Token keyword, Expr? value',
-      'Var          : Token name, Expr? initializer',
-      'While        : Expr condition, Stmt body',
+      'If          : Expr condition, Stmt thenBranch, Stmt? elseBranch',
+      'Print       : Expr expression',
+      'Return      : Token keyword, Expr? value',
+      'Break       : Token keyword',
+      'Var         : Token name, Expr? initializer',
+      'While       : Expr condition, Stmt body',
+      'WhilePass   : Expr? condition, String funcName',
     ]);
   }
 

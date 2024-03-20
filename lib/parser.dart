@@ -1,6 +1,6 @@
-import 'package:mcfp_compiler/ast_expr.dart';
-import 'package:mcfp_compiler/ast_stmt.dart';
-import 'package:mcfp_compiler/lexer.dart';
+import 'package:mcfp/ast_expr.dart';
+import 'package:mcfp/ast_stmt.dart';
+import 'package:mcfp/lexer.dart';
 
 class ParseError implements Exception {}
 
@@ -47,10 +47,11 @@ class Parser {
   }
 
   Stmt _statement() {
-    if (_match(TokenType.FOR)) return _forStatement();
+    //if (_match(TokenType.FOR)) return _forStatement();
     if (_match(TokenType.IF)) return _ifStatement();
     if (_match(TokenType.PRINT)) return _printStatement();
     if (_match(TokenType.RETURN)) return _returnStatement();
+    if (_match(TokenType.BREAK)) return _breakStatement();
     if (_match(TokenType.WHILE)) return _whileStatement();
     if (_match(TokenType.LEFT_BRACE)) return Block(_block());
 
@@ -133,10 +134,16 @@ class Parser {
     return Return(keyword, value);
   }
 
+  Stmt _breakStatement() {
+    final keyword = _previous();
+    _consume(TokenType.SEMICOLON, 'Expect \';\' after \'break\'.');
+    return Break(keyword);
+  }
+
   Stmt _whileStatement() {
     _consume(TokenType.LEFT_PAREN, 'Expect \'(\' after \'while\'.');
     final condition = _expression();
-    _consume(TokenType.LEFT_PAREN, 'Expect \')\' after condition.');
+    _consume(TokenType.RIGHT_PAREN, 'Expect \')\' after condition.');
     final body = _statement();
 
     return While(condition, body);
