@@ -7,7 +7,7 @@ A high level general purpose programming language that compiles into mcfunction
 #### Features
 
 - Arithmetic expressions
-- Dynamically typed variables
+
   - int and bool only
 - if / else statements
 - while / for loops
@@ -83,7 +83,7 @@ for(var b = 1; a < 1000000000; b = temp + b) {
   ```
 
   #### fib_f94es0fi256g.mcfunction
-  
+
   ```mcfunction
   # PRINT
   tellraw @a [{"text":"MCFP: "},{"score":{"name":"fib_a","objective":"mcfp_runtime"}}]
