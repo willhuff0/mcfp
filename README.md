@@ -26,7 +26,7 @@ A high level general purpose programming language that compiles into mcfunction
 
 Prints to chat the Fibonacci sequence up to 4181
 
-```
+```c
 var a = 0;
 var temp;
 
@@ -36,6 +36,83 @@ for(var b = 1; a < 1000000000; b = temp + b) {
   a = b;
 }
 ```
+
+<details>
+  <summary>Compiled mcfunction</summary>
+  
+  #### fib.mcfunction
+
+  ```mcfunction
+  # Compiled by mcfp_dart 1.0
+
+  # RUNTIME SETUP
+
+  scoreboard objectives add mcfp_runtime dummy
+  scoreboard players reset * mcfp_runtime
+  scoreboard objectives setdisplay sidebar mcfp_runtime
+  scoreboard players set neg_one mcfp_runtime -1
+
+  # END RUNTIME SETUP
+  # WALKING SYNTAX TREE
+
+
+  # VAR
+  scoreboard players set fib_a mcfp_runtime 0
+
+  # VAR
+  scoreboard players set fib_temp mcfp_runtime 0
+
+  # VAR
+  scoreboard players set fib_b mcfp_runtime 1
+
+  # WHILE CONDITION
+  scoreboard players set fib_ul9bxhafejxk mcfp_runtime 1000000000
+  scoreboard players set fib_nvookfnascfg mcfp_runtime 0
+  execute if score fib_a mcfp_runtime < fib_ul9bxhafejxk mcfp_runtime run scoreboard players set fib_nvookfnascfg mcfp_runtime 1
+  scoreboard players reset fib_ul9bxhafejxk mcfp_runtime
+
+  # WHILE REPEAT
+  scoreboard players set should_break mcfp_runtime 0
+  execute if score fib_nvookfnascfg mcfp_runtime matches 1 run execute if function mcfp:fib_f94es0fi256g run return 1
+  scoreboard players reset fib_nvookfnascfg mcfp_runtime
+
+  # CLEAN
+  scoreboard players reset fib_a mcfp_runtime
+  scoreboard players reset fib_temp mcfp_runtime
+  scoreboard players reset fib_b mcfp_runtime
+  ```
+
+  #### fib_f94es0fi256g.mcfunction
+  
+  ```mcfunction
+  # PRINT
+  tellraw @a [{"text":"MCFP: "},{"score":{"name":"fib_a","objective":"mcfp_runtime"}}]
+
+  # ASSIGN
+  scoreboard players operation fib_temp mcfp_runtime = fib_a mcfp_runtime
+
+  # ASSIGN
+  scoreboard players operation fib_a mcfp_runtime = fib_b mcfp_runtime
+
+  # ASSIGN
+  scoreboard players operation fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime = fib_temp mcfp_runtime
+  scoreboard players operation fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime += fib_b mcfp_runtime
+  scoreboard players operation fib_b mcfp_runtime = fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime
+  scoreboard players reset fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime
+
+  # WHILE CONDITION
+  scoreboard players set fib_f94es0fi256g_j51op68hjtar mcfp_runtime 1000000000
+  scoreboard players set fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime 0
+  execute if score fib_a mcfp_runtime < fib_f94es0fi256g_j51op68hjtar mcfp_runtime run scoreboard players set fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime 1
+  scoreboard players reset fib_f94es0fi256g_j51op68hjtar mcfp_runtime
+
+  # WHILE REPEAT
+  execute if score should_break mcfp_runtime matches 1 run return 0
+  execute if score fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime matches 1 run execute if function mcfp:fib_f94es0fi256g run return 1
+  scoreboard players reset fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime
+  ```
+  
+</details>
 
 ## Syntax
 
