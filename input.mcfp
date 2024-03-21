@@ -1,33 +1,18 @@
-// func check(x) {
-//     if (x >= 5) return true;
-//     else return false;
-// }
-
-// var n = 10;
-// var c = 5;
-
-// n = n * (c + 10);
-
-// if (check(n)) {
-//     print 1;
-// }
-// else {
-//     print 0;
-// }
-
-var start = time();
-
-var a = 0;
-var temp;
-
-var b = 1;
-while (a < 1000000000) {
-  print a;
-  temp = a;
-  a = b;
-  b = temp + b;
+struct Vector3 {
+  var x = 1;
+  var y = 1;
+  var z = 1;
 }
 
-var end = time();
+var bruh = Vector3(10, 10, 10);
 
-print end - start;
+print bruh.y + bruh.x;
+
+// var a = 0;
+// var temp;
+
+// for(var b = 1; a < 1000000000; b = temp + b) {
+//   print a;
+//   temp = a;
+//   a = b;
+// }

@@ -47,6 +47,7 @@ enum TokenType {
   BREAK(''),
   VAR(''),
   WHILE(''),
+  STRUCT(''),
 
   EOF('');
 
@@ -73,7 +74,7 @@ const _keywords = {
   'false': TokenType.FALSE,
   'true': TokenType.TRUE,
   'func': TokenType.FUNC,
-  //'for': TokenType.FOR,
+  'for': TokenType.FOR,
   'if': TokenType.IF,
   'null': TokenType.NULL,
   'print': TokenType.PRINT,
@@ -81,6 +82,7 @@ const _keywords = {
   'break': TokenType.BREAK,
   'var': TokenType.VAR,
   'while': TokenType.WHILE,
+  'struct': TokenType.STRUCT,
 };
 
 class Scanner {

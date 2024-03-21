@@ -7,6 +7,8 @@ abstract class Stmt {
 
 abstract interface class Visitor<R> {
   R visitBlockStmt(Block stmt);
+  R visitInlineBlockStmt(InlineBlock stmt);
+  R visitInlinerStmt(Inliner stmt);
   R visitExpressionStmt(Expression stmt);
   R visitASTFunctionStmt(ASTFunction stmt);
   R visitIfStmt(If stmt);
@@ -16,6 +18,7 @@ abstract interface class Visitor<R> {
   R visitVarStmt(Var stmt);
   R visitWhileStmt(While stmt);
   R visitWhilePassStmt(WhilePass stmt);
+  R visitStructStmt(Struct stmt);
 }
 
 class Block extends Stmt {
@@ -26,6 +29,28 @@ class Block extends Stmt {
   @override
   R accept<R>(Visitor<R> visitor) {
     return visitor.visitBlockStmt(this);
+  }
+}
+
+class InlineBlock extends Stmt {
+  final List<Stmt> statements;
+
+  InlineBlock(this.statements);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitInlineBlockStmt(this);
+  }
+}
+
+class Inliner extends Stmt {
+  final Stmt statement;
+
+  Inliner(this.statement);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitInlinerStmt(this);
   }
 }
 
@@ -133,6 +158,18 @@ class WhilePass extends Stmt {
   @override
   R accept<R>(Visitor<R> visitor) {
     return visitor.visitWhilePassStmt(this);
+  }
+}
+
+class Struct extends Stmt {
+  final Token name;
+  final List<Var> properties;
+
+  Struct(this.name, this.properties);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitStructStmt(this);
   }
 }
 

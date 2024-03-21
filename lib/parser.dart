@@ -2,7 +2,21 @@ import 'package:mcfp/ast_expr.dart';
 import 'package:mcfp/ast_stmt.dart';
 import 'package:mcfp/lexer.dart';
 
-class ParseError implements Exception {}
+class ParseError implements Exception {
+  final Token token;
+  final String message;
+
+  ParseError(this.token, this.message);
+
+  @override
+  String toString() {
+    if (token.type == TokenType.EOF) {
+      return 'Parse Error at line ${token.line}, EOF: $message';
+    } else {
+      return 'Parse Error at line ${token.line}, \'${token.lexeme}\': $message';
+    }
+  }
+}
 
 class Parser {
   final List<Token> _tokens;
@@ -47,12 +61,13 @@ class Parser {
   }
 
   Stmt _statement() {
-    //if (_match(TokenType.FOR)) return _forStatement();
+    if (_match(TokenType.FOR)) return _forStatement();
     if (_match(TokenType.IF)) return _ifStatement();
     if (_match(TokenType.PRINT)) return _printStatement();
     if (_match(TokenType.RETURN)) return _returnStatement();
     if (_match(TokenType.BREAK)) return _breakStatement();
     if (_match(TokenType.WHILE)) return _whileStatement();
+    if (_match(TokenType.STRUCT)) return _structStatement();
     if (_match(TokenType.LEFT_BRACE)) return Block(_block());
 
     return _expressionStatement();
@@ -81,7 +96,7 @@ class Parser {
     }
     _consume(TokenType.RIGHT_PAREN, 'Expect \')\' after for clauses.');
 
-    var body = _statement();
+    Stmt body = Inliner(_statement());
 
     if (increment != null) {
       body = Block([
@@ -94,7 +109,7 @@ class Parser {
     body = While(condition, body);
 
     if (initializer != null) {
-      body = Block([
+      body = InlineBlock([
         initializer,
         body,
       ]);
@@ -147,6 +162,25 @@ class Parser {
     final body = _statement();
 
     return While(condition, body);
+  }
+
+  Stmt _structStatement() {
+    final name = _consume(TokenType.IDENTIFIER, 'Expect name after \'struct\'.');
+
+    _consume(TokenType.LEFT_BRACE, 'Expect \'{\' after struct name.');
+
+    final properties = <Var>[];
+    while (!_check(TokenType.RIGHT_BRACE)) {
+      if (properties.length >= 255) {
+        _error(_peek(), 'Can\'t have more than 255 properties in a struct.');
+      }
+
+      _consume(TokenType.VAR, 'Expected \'var\' inside struct body');
+      properties.add(_varDeclaration() as Var);
+    }
+    _consume(TokenType.RIGHT_BRACE, 'Expect \'}\' after properties in struct.');
+
+    return Struct(name, properties);
   }
 
   Stmt _expressionStatement() {
@@ -203,6 +237,8 @@ class Parser {
       if (expr is Variable) {
         final name = expr.name;
         return Assign(name, value);
+      } else if (expr is Get) {
+        return Set(expr.object, expr.name, value);
       }
 
       _error(equals, 'Invalid assignment target.');
@@ -299,7 +335,11 @@ class Parser {
     while (true) {
       if (_match(TokenType.LEFT_PAREN)) {
         expr = _finishCall(expr);
-      } else {
+      } else if (_match(TokenType.DOT)) {
+        final name = _consume(TokenType.IDENTIFIER, 'Expect property name after \'.\'.');
+        expr = Get(expr, name);
+      }
+      {
         break;
       }
     }
@@ -352,8 +392,9 @@ class Parser {
   }
 
   ParseError _error(Token token, String message) {
-    _reportParserError(token, message);
-    return ParseError();
+    final error = ParseError(token, message);
+    _reportParserError(error);
+    return error;
   }
 
   void _synchronize() {
@@ -423,10 +464,6 @@ class Parser {
   }
 }
 
-void _reportParserError(Token token, String message) {
-  if (token.type == TokenType.EOF) {
-    print('Error at line ${token.line}, EOF: $message');
-  } else {
-    print('Error at line ${token.line}, \'${token.lexeme}\': $message');
-  }
+void _reportParserError(ParseError error) {
+  print(error);
 }
