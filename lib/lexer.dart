@@ -34,14 +34,12 @@ enum TokenType {
   NUMBER(''),
 
   // Keywords
-  CLASS(''),
   ELSE(''),
   FALSE(''),
   TRUE(''),
   FUNC(''),
   FOR(''),
   IF(''),
-  NULL(''),
   PRINT(''),
   RETURN(''),
   BREAK(''),
@@ -69,14 +67,12 @@ class Token {
 }
 
 const _keywords = {
-  'class': TokenType.CLASS,
   'else': TokenType.ELSE,
   'false': TokenType.FALSE,
   'true': TokenType.TRUE,
   'func': TokenType.FUNC,
   'for': TokenType.FOR,
   'if': TokenType.IF,
-  'null': TokenType.NULL,
   'print': TokenType.PRINT,
   'return': TokenType.RETURN,
   'break': TokenType.BREAK,

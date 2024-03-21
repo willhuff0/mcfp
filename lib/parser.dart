@@ -366,7 +366,6 @@ class Parser {
   Expr _primary() {
     if (_match(TokenType.FALSE)) return Literal(false);
     if (_match(TokenType.TRUE)) return Literal(true);
-    if (_match(TokenType.NULL)) return Literal(null);
 
     if (_matchAny([TokenType.NUMBER, TokenType.STRING])) {
       return Literal(_previous().literal);
@@ -404,7 +403,6 @@ class Parser {
       if (_previous().type == TokenType.SEMICOLON) return;
 
       switch (_peek().type) {
-        case TokenType.CLASS:
         case TokenType.FUNC:
         case TokenType.VAR:
         case TokenType.FOR:

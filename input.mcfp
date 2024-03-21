@@ -1,18 +1,8 @@
-struct Vector3 {
-  var x = 1;
-  var y = 1;
-  var z = 1;
+var a = 0;
+var temp;
+
+for(var b = 1; a < 1000000000; b = temp + b) {
+  print a;
+  temp = a;
+  a = b;
 }
-
-var bruh = Vector3(10, 10, 10);
-
-print bruh.y + bruh.x;
-
-// var a = 0;
-// var temp;
-
-// for(var b = 1; a < 1000000000; b = temp + b) {
-//   print a;
-//   temp = a;
-//   a = b;
-// }
