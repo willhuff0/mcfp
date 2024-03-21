@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:mcfp/ast_expr.dart' as ast_expr;
 import 'package:mcfp/ast_stmt.dart' as ast_stmt;
 import 'package:mcfp/lexer.dart';
+import 'package:mcfp/parser.dart';
 import 'package:path/path.dart' as p;
 
 const _pretty = true;
@@ -29,10 +30,12 @@ class CompileError implements Exception {
 }
 
 class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void> {
+  final String rootPath;
+
   final Environment _globalEnv;
   late Environment env;
 
-  Compiler({required String rootEnvName}) : _globalEnv = Environment(null, rootEnvName) {
+  Compiler({required this.rootPath, required String rootEnvName}) : _globalEnv = Environment(null, rootEnvName) {
     env = _globalEnv;
 
     const versionTag = 'Compiled by mcfp_dart 1.0';
@@ -51,6 +54,13 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
 
     env.lines.add('scoreboard players set neg_one mcfp_runtime -1');
 
+    if (_pretty) {
+      env.commentAll([
+        'END RUNTIME SETUP',
+        'WALKING SYNTAX TREE',
+      ]);
+    }
+
     _defineNativeFunc('getGameTime', 0, (compiler, arguments) {
       final resultName = compiler._defineNewVar();
       compiler.env.lines.add('execute store result score ${compiler.env.eval(resultName)} mcfp_runtime run time query gametime');
@@ -59,12 +69,6 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
   }
 
   void compile(List<ast_stmt.Stmt> statements) {
-    if (_pretty) {
-      env.commentAll([
-        'END RUNTIME SETUP',
-        'WALKING SYNTAX TREE',
-      ]);
-    }
     for (final statement in statements) {
       _build(statement);
     }
@@ -308,6 +312,33 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
   @override
   void visitStructStmt(ast_stmt.Struct stmt) {
     env.defineFunc(stmt.name.lexeme, StructInitializerCallable(stmt.properties));
+  }
+
+  @override
+  void visitImportStmt(ast_stmt.Import stmt) {
+    final path = p.join(rootPath, stmt.path.literal as String);
+
+    final input = File(path).readAsStringSync();
+
+    final scanner = Scanner(input);
+    final tokens = scanner.scanTokens();
+
+    final parser = Parser(tokens);
+    final statements = parser.parse();
+
+    if (_pretty) {
+      env.comment('IMPORT: ${stmt.path.literal as String}');
+    }
+
+    compile(statements);
+
+    if (_pretty) {
+      env.comment('END IMPORT');
+    }
+
+    final newEnvName = _getNewName();
+    env.lines.add('function mcfp:${env.evalShallow(newEnvName)}');
+    env = Environment(env, newEnvName);
   }
 
   @override

@@ -38,6 +38,7 @@ class AstGenerator {
       'While       : Expr condition, Stmt body',
       'WhilePass   : Expr? condition, String funcName',
       'Struct      : Token name, List<Var> properties',
+      'Import      : Token path',
     ]);
   }
 

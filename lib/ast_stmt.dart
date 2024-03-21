@@ -19,6 +19,7 @@ abstract interface class Visitor<R> {
   R visitWhileStmt(While stmt);
   R visitWhilePassStmt(WhilePass stmt);
   R visitStructStmt(Struct stmt);
+  R visitImportStmt(Import stmt);
 }
 
 class Block extends Stmt {
@@ -170,6 +171,17 @@ class Struct extends Stmt {
   @override
   R accept<R>(Visitor<R> visitor) {
     return visitor.visitStructStmt(this);
+  }
+}
+
+class Import extends Stmt {
+  final Token path;
+
+  Import(this.path);
+
+  @override
+  R accept<R>(Visitor<R> visitor) {
+    return visitor.visitImportStmt(this);
   }
 }
 

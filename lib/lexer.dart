@@ -46,6 +46,7 @@ enum TokenType {
   VAR(''),
   WHILE(''),
   STRUCT(''),
+  IMPORT(''),
 
   EOF('');
 
@@ -79,6 +80,7 @@ const _keywords = {
   'var': TokenType.VAR,
   'while': TokenType.WHILE,
   'struct': TokenType.STRUCT,
+  'import': TokenType.IMPORT,
 };
 
 class Scanner {

@@ -1,3 +1,5 @@
+// Prints to chat the Fibonacci sequence up to 701408733
+
 var a = 0;
 var temp;
 

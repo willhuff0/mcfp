@@ -16,7 +16,7 @@ scoreboard players set fib_a mcfp_runtime 0
 
 # VAR
 scoreboard players set fib_temp mcfp_runtime 0
-execute if function mcfp:fib_81mhhwi0mdic run return 1
+execute if function mcfp:fib_oznzmf982b30 run return 1
 
 # CLEAN
 scoreboard players reset fib_a mcfp_runtime

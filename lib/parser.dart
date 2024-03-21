@@ -68,6 +68,7 @@ class Parser {
     if (_match(TokenType.BREAK)) return _breakStatement();
     if (_match(TokenType.WHILE)) return _whileStatement();
     if (_match(TokenType.STRUCT)) return _structStatement();
+    if (_match(TokenType.IMPORT)) return _importStatement();
     if (_match(TokenType.LEFT_BRACE)) return Block(_block());
 
     return _expressionStatement();
@@ -181,6 +182,12 @@ class Parser {
     _consume(TokenType.RIGHT_BRACE, 'Expect \'}\' after properties in struct.');
 
     return Struct(name, properties);
+  }
+
+  Stmt _importStatement() {
+    final path = _consume(TokenType.STRING, 'Expect path string after \'import\'.');
+    _consume(TokenType.SEMICOLON, 'Expect \';\' after path string.');
+    return Import(path);
   }
 
   Stmt _expressionStatement() {

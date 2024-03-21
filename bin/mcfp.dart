@@ -15,7 +15,7 @@ void main(List<String> arguments) async {
   final parser = Parser(tokens);
   final statements = parser.parse();
 
-  final compiler = Compiler(rootEnvName: scriptName);
+  final compiler = Compiler(rootPath: 'scripts', rootEnvName: scriptName);
   compiler.compile(statements);
   compiler.writeToDir('out');
 }

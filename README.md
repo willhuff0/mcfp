@@ -24,7 +24,7 @@ A high level general purpose programming language that compiles into mcfunction
 
 ## Example
 
-Prints to chat the Fibonacci sequence up to 4181
+Prints to chat the Fibonacci sequence up to 701408733
 
 ```c
 var a = 0;
