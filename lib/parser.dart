@@ -109,7 +109,7 @@ class Parser {
     body = While(condition, body);
 
     if (initializer != null) {
-      body = InlineBlock([
+      body = Block([
         initializer,
         body,
       ]);
