@@ -187,7 +187,7 @@ arguments      → expression ( "," expression )* ;
 ```
 
 ```
-NUMBER         → DIGIT+ ( "." DIGIT+ )? ;
+NUMBER         → DIGIT+ ;
 STRING         → "\"" <any char except "\"">* "\"" ;
 IDENTIFIER     → ALPHA ( ALPHA | DIGIT )* ;
 ALPHA          → "a" ... "z" | "A" ... "Z" | "_" ;
