@@ -2,17 +2,15 @@
 
 A high level general purpose programming language that compiles into mcfunction
 
-
-
 #### Features
 
 - Arithmetic expressions
-
   - int and bool only
 - if / else statements
 - while / for loops
 - Functions
 - Structs
+- Import statements
 
 #### Limitations
 
@@ -24,7 +22,7 @@ A high level general purpose programming language that compiles into mcfunction
 
 ## Example
 
-Prints to chat the Fibonacci sequence up to 701408733
+Prints to chat the Fibonacci sequence up to n = 44, 701408733
 
 ```c
 var a = 0;
@@ -39,6 +37,8 @@ for(var b = 1; a < 1000000000; b = temp + b) {
 
 <details>
   <summary>Compiled mcfunction</summary>
+
+  Compiled with pretty and debug mode on.
   
   #### fib.mcfunction
 
@@ -61,28 +61,35 @@ for(var b = 1; a < 1000000000; b = temp + b) {
 
   # VAR
   scoreboard players set fib_temp mcfp_runtime 0
-
-  # VAR
-  scoreboard players set fib_b mcfp_runtime 1
-
-  # WHILE CONDITION
-  scoreboard players set fib_ul9bxhafejxk mcfp_runtime 1000000000
-  scoreboard players set fib_nvookfnascfg mcfp_runtime 0
-  execute if score fib_a mcfp_runtime < fib_ul9bxhafejxk mcfp_runtime run scoreboard players set fib_nvookfnascfg mcfp_runtime 1
-  scoreboard players reset fib_ul9bxhafejxk mcfp_runtime
-
-  # WHILE REPEAT
-  scoreboard players set should_break mcfp_runtime 0
-  execute if score fib_nvookfnascfg mcfp_runtime matches 1 run execute if function mcfp:fib_f94es0fi256g run return 1
-  scoreboard players reset fib_nvookfnascfg mcfp_runtime
+  execute if function mcfp:fib_oznzmf982b30 run return 1
 
   # CLEAN
   scoreboard players reset fib_a mcfp_runtime
   scoreboard players reset fib_temp mcfp_runtime
-  scoreboard players reset fib_b mcfp_runtime
   ```
 
-  #### fib_f94es0fi256g.mcfunction
+  #### fib_oznzmf982b30.mcfunction
+
+  ```mcfunction
+  # VAR
+  scoreboard players set fib_oznzmf982b30_b mcfp_runtime 1
+
+  # WHILE CONDITION
+  scoreboard players set fib_oznzmf982b30_h9ruyup5510f mcfp_runtime 1000000000
+  scoreboard players set fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime 0
+  execute if score fib_a mcfp_runtime < fib_oznzmf982b30_h9ruyup5510f mcfp_runtime run scoreboard players set fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime 1
+  scoreboard players reset fib_oznzmf982b30_h9ruyup5510f mcfp_runtime
+
+  # WHILE REPEAT
+  scoreboard players set should_break mcfp_runtime 0
+  execute if score fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime matches 1 run execute if function mcfp:fib_oznzmf982b30_5juiuc8ypdr9 run return 1
+  scoreboard players reset fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime
+
+  # CLEAN
+  scoreboard players reset fib_oznzmf982b30_b mcfp_runtime
+  ```
+
+  #### fib_oznzmf982b30_5juiuc8ypdr9.mcfunction
 
   ```mcfunction
   # PRINT
@@ -92,24 +99,24 @@ for(var b = 1; a < 1000000000; b = temp + b) {
   scoreboard players operation fib_temp mcfp_runtime = fib_a mcfp_runtime
 
   # ASSIGN
-  scoreboard players operation fib_a mcfp_runtime = fib_b mcfp_runtime
+  scoreboard players operation fib_a mcfp_runtime = fib_oznzmf982b30_b mcfp_runtime
 
   # ASSIGN
-  scoreboard players operation fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime = fib_temp mcfp_runtime
-  scoreboard players operation fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime += fib_b mcfp_runtime
-  scoreboard players operation fib_b mcfp_runtime = fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime
-  scoreboard players reset fib_f94es0fi256g_eaklo85dcyzp mcfp_runtime
+  scoreboard players operation fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime = fib_temp mcfp_runtime
+  scoreboard players operation fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime += fib_oznzmf982b30_b mcfp_runtime
+  scoreboard players operation fib_oznzmf982b30_b mcfp_runtime = fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime
+  scoreboard players reset fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime
 
   # WHILE CONDITION
-  scoreboard players set fib_f94es0fi256g_j51op68hjtar mcfp_runtime 1000000000
-  scoreboard players set fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime 0
-  execute if score fib_a mcfp_runtime < fib_f94es0fi256g_j51op68hjtar mcfp_runtime run scoreboard players set fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime 1
-  scoreboard players reset fib_f94es0fi256g_j51op68hjtar mcfp_runtime
+  scoreboard players set fib_oznzmf982b30_5juiuc8ypdr9_0eh3qtaf8kfn mcfp_runtime 1000000000
+  scoreboard players set fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime 0
+  execute if score fib_a mcfp_runtime < fib_oznzmf982b30_5juiuc8ypdr9_0eh3qtaf8kfn mcfp_runtime run scoreboard players set fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime 1
+  scoreboard players reset fib_oznzmf982b30_5juiuc8ypdr9_0eh3qtaf8kfn mcfp_runtime
 
   # WHILE REPEAT
   execute if score should_break mcfp_runtime matches 1 run return 0
-  execute if score fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime matches 1 run execute if function mcfp:fib_f94es0fi256g run return 1
-  scoreboard players reset fib_f94es0fi256g_f8fb4nf994qg mcfp_runtime
+  execute if score fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime matches 1 run execute if function mcfp:fib_oznzmf982b30_5juiuc8ypdr9 run return 1
+  scoreboard players reset fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime
   ```
   
 </details>
@@ -138,6 +145,7 @@ statement      → exprStmt
                | printStmt
                | returnStmt
                | whileStmt
+               | importStmt
                | block ;
 
 exprStmt       → expression ";" ;
@@ -149,6 +157,7 @@ ifStmt         → "if" "(" expression ")" statement
 printStmt      → "print" expression ";" ;
 returnStmt     → "return" expression? ";" ;
 whileStmt      → "while" "(" expression ")" statement ;
+importStmt     → "import" STRING ";" ;
 block          → "{" declaration* "}" ;
 ```
 
@@ -179,6 +188,7 @@ arguments      → expression ( "," expression )* ;
 
 ```
 NUMBER         → DIGIT+ ( "." DIGIT+ )? ;
+STRING         → "\"" <any char except "\"">* "\"" ;
 IDENTIFIER     → ALPHA ( ALPHA | DIGIT )* ;
 ALPHA          → "a" ... "z" | "A" ... "Z" | "_" ;
 DIGIT          → "0" ... "9" ;
