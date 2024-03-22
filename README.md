@@ -133,7 +133,7 @@ declaration    → structDecl
                | varDecl
                | statement ;
 
-structDecl      → "struct" IDENTIFIER "{" varDecl* "}" ;
+structDecl     → "struct" IDENTIFIER "{" varDecl* "}" ;
 funDecl        → "func" function ;
 varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
 ```
