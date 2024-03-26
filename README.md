@@ -19,26 +19,33 @@ A high level general purpose programming language that compiles into mcfunction
   - This means implementing a resizable list is not possible
 - No recursive function calls
   - Because dynamic allocation is not possible, properties of recursive function calls cannot be stored. This could be rectified by allowing a fixed number of recursions, but I find that this defeats the purpose of supporting the feature, so I chose to leave it out.
+- No floating point numbers, bytes
+  - Minecraft supports storage of int8, int16, int32, int64, float32, and float64 values via the ```/data``` command. In order to perform arithmetic, these values must be copied to the scoreboard and are casted to int32
+    - Vote here so Mojang adds floating point math: [Add a math parameter to /data modify - Minecraft Feedback](https://feedback.minecraft.net/hc/en-us/community/posts/360047978892-Add-a-math-parameter-to-data-modify)
+  - Fixed point numbers are possible but I have not explicitly implemented them
 
 ## Example
 
-Prints to chat the Fibonacci sequence up to n = 44, 701408733
+#### fib.mcfp
 
 ```c
-var a = 0;
-var temp;
+// Prints to chat the Fibonacci sequence up to n = 25, 46368
 
-for(var b = 1; a < 1000000000; b = temp + b) {
-  print a;
-  temp = a;
+var a = 0;
+var b = 1;
+
+for (var n = 0; n < 25; n = n + 1) {
+  var temp = a;
   a = b;
+  b = temp + b;
+  print temp;
 }
 ```
 
+Compiled in 10.89 ms with pretty and debug mode on.
+
 <details>
   <summary>Compiled mcfunction</summary>
-
-  Compiled with pretty and debug mode on.
   
   #### fib.mcfunction
 
@@ -60,68 +67,85 @@ for(var b = 1; a < 1000000000; b = temp + b) {
   scoreboard players set fib_a mcfp_runtime 0
 
   # VAR
-  scoreboard players set fib_temp mcfp_runtime 0
-  execute if function mcfp:fib_oznzmf982b30 run return 1
+  scoreboard players set fib_b mcfp_runtime 1
+  execute if function mcfp:fib_91lozjus6a5b run return 1
 
   # CLEAN
   scoreboard players reset fib_a mcfp_runtime
-  scoreboard players reset fib_temp mcfp_runtime
+  scoreboard players reset fib_b mcfp_runtime
+  scoreboard players reset fib_91lozjus6a5b_n mcfp_runtime
+  scoreboard players reset fib_91lozjus6a5b_x3jf5nvq4k7h mcfp_runtime
+
+  # RUNTIME CLEAN
+  scoreboard players reset neg_one mcfp_runtime
+  scoreboard players reset return_value mcfp_runtime
+  scoreboard players reset should_break mcfp_runtime
   ```
 
-  #### fib_oznzmf982b30.mcfunction
+  #### fib_91lozjus6a5b.mcfunction
 
   ```mcfunction
   # VAR
-  scoreboard players set fib_oznzmf982b30_b mcfp_runtime 1
+  scoreboard players set fib_91lozjus6a5b_n mcfp_runtime 0
 
   # WHILE CONDITION
-  scoreboard players set fib_oznzmf982b30_h9ruyup5510f mcfp_runtime 1000000000
-  scoreboard players set fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime 0
-  execute if score fib_a mcfp_runtime < fib_oznzmf982b30_h9ruyup5510f mcfp_runtime run scoreboard players set fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime 1
-  scoreboard players reset fib_oznzmf982b30_h9ruyup5510f mcfp_runtime
+  scoreboard players set fib_91lozjus6a5b_4y4atkm2319k mcfp_runtime 25
+  scoreboard players set fib_91lozjus6a5b_x3jf5nvq4k7h mcfp_runtime 0
+  execute if score fib_91lozjus6a5b_n mcfp_runtime < fib_91lozjus6a5b_4y4atkm2319k mcfp_runtime run scoreboard players set fib_91lozjus6a5b_x3jf5nvq4k7h mcfp_runtime 1
+  scoreboard players reset fib_91lozjus6a5b_4y4atkm2319k mcfp_runtime
 
   # WHILE REPEAT
   scoreboard players set should_break mcfp_runtime 0
-  execute if score fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime matches 1 run execute if function mcfp:fib_oznzmf982b30_5juiuc8ypdr9 run return 1
-  scoreboard players reset fib_oznzmf982b30_vknqxk613cv4 mcfp_runtime
-
-  # CLEAN
-  scoreboard players reset fib_oznzmf982b30_b mcfp_runtime
+  execute if score fib_91lozjus6a5b_x3jf5nvq4k7h mcfp_runtime matches 1 run execute if function mcfp:fib_91lozjus6a5b_l1lcp73oc9te run return 1
+  scoreboard players reset fib_91lozjus6a5b_x3jf5nvq4k7h mcfp_runtime
   ```
 
-  #### fib_oznzmf982b30_5juiuc8ypdr9.mcfunction
+  #### fib_91lozjus6a5b_l1lcp73oc9te.mcfunction
 
   ```mcfunction
+  # VAR
+  scoreboard players operation fib_91lozjus6a5b_l1lcp73oc9te_temp mcfp_runtime = fib_a mcfp_runtime
+
+  # ASSIGN
+  scoreboard players operation fib_a mcfp_runtime = fib_b mcfp_runtime
+
+  # ASSIGN
+  scoreboard players operation fib_91lozjus6a5b_l1lcp73oc9te_za0ysaxto51i mcfp_runtime = fib_91lozjus6a5b_l1lcp73oc9te_temp mcfp_runtime
+  scoreboard players operation fib_91lozjus6a5b_l1lcp73oc9te_za0ysaxto51i mcfp_runtime += fib_b mcfp_runtime
+  scoreboard players operation fib_b mcfp_runtime = fib_91lozjus6a5b_l1lcp73oc9te_za0ysaxto51i mcfp_runtime
+  scoreboard players reset fib_91lozjus6a5b_l1lcp73oc9te_za0ysaxto51i mcfp_runtime
+
   # PRINT
-  tellraw @a [{"text":"MCFP: "},{"score":{"name":"fib_a","objective":"mcfp_runtime"}}]
+  tellraw @a [{"text":"fib: "},{"score":{"name":"fib_91lozjus6a5b_l1lcp73oc9te_temp","objective":"mcfp_runtime"}}]
 
   # ASSIGN
-  scoreboard players operation fib_temp mcfp_runtime = fib_a mcfp_runtime
-
-  # ASSIGN
-  scoreboard players operation fib_a mcfp_runtime = fib_oznzmf982b30_b mcfp_runtime
-
-  # ASSIGN
-  scoreboard players operation fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime = fib_temp mcfp_runtime
-  scoreboard players operation fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime += fib_oznzmf982b30_b mcfp_runtime
-  scoreboard players operation fib_oznzmf982b30_b mcfp_runtime = fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime
-  scoreboard players reset fib_oznzmf982b30_5juiuc8ypdr9_7d7bm9f3a4ys mcfp_runtime
+  scoreboard players set fib_91lozjus6a5b_l1lcp73oc9te_u41kmytd0iwn mcfp_runtime 1
+  scoreboard players operation fib_91lozjus6a5b_l1lcp73oc9te_nr3e651z7b8q mcfp_runtime = fib_91lozjus6a5b_n mcfp_runtime
+  scoreboard players operation fib_91lozjus6a5b_l1lcp73oc9te_nr3e651z7b8q mcfp_runtime += fib_91lozjus6a5b_l1lcp73oc9te_u41kmytd0iwn mcfp_runtime
+  scoreboard players reset fib_91lozjus6a5b_l1lcp73oc9te_u41kmytd0iwn mcfp_runtime
+  scoreboard players operation fib_91lozjus6a5b_n mcfp_runtime = fib_91lozjus6a5b_l1lcp73oc9te_nr3e651z7b8q mcfp_runtime
+  scoreboard players reset fib_91lozjus6a5b_l1lcp73oc9te_nr3e651z7b8q mcfp_runtime
 
   # WHILE CONDITION
-  scoreboard players set fib_oznzmf982b30_5juiuc8ypdr9_0eh3qtaf8kfn mcfp_runtime 1000000000
-  scoreboard players set fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime 0
-  execute if score fib_a mcfp_runtime < fib_oznzmf982b30_5juiuc8ypdr9_0eh3qtaf8kfn mcfp_runtime run scoreboard players set fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime 1
-  scoreboard players reset fib_oznzmf982b30_5juiuc8ypdr9_0eh3qtaf8kfn mcfp_runtime
+  scoreboard players set fib_91lozjus6a5b_l1lcp73oc9te_0xouqicezd1w mcfp_runtime 25
+  scoreboard players set fib_91lozjus6a5b_l1lcp73oc9te_xr64ziewvzg2 mcfp_runtime 0
+  execute if score fib_91lozjus6a5b_n mcfp_runtime < fib_91lozjus6a5b_l1lcp73oc9te_0xouqicezd1w mcfp_runtime run scoreboard players set fib_91lozjus6a5b_l1lcp73oc9te_xr64ziewvzg2 mcfp_runtime 1
+  scoreboard players reset fib_91lozjus6a5b_l1lcp73oc9te_0xouqicezd1w mcfp_runtime
 
   # WHILE REPEAT
   execute if score should_break mcfp_runtime matches 1 run return 0
-  execute if score fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime matches 1 run execute if function mcfp:fib_oznzmf982b30_5juiuc8ypdr9 run return 1
-  scoreboard players reset fib_oznzmf982b30_5juiuc8ypdr9_fjo9kv182fzj mcfp_runtime
+  execute if score fib_91lozjus6a5b_l1lcp73oc9te_xr64ziewvzg2 mcfp_runtime matches 1 run execute if function mcfp:fib_91lozjus6a5b_l1lcp73oc9te run return 1
+  scoreboard players reset fib_91lozjus6a5b_l1lcp73oc9te_xr64ziewvzg2 mcfp_runtime
   ```
   
 </details>
 
-## Syntax
+## Language
+
+Grammar is similar to [Lox](https://craftinginterpreters.com/the-lox-language.html).
+
+<details>
+  <summary>Syntax</summary>
 
 ```
 program        → declaration* EOF ;
@@ -193,3 +217,5 @@ IDENTIFIER     → ALPHA ( ALPHA | DIGIT )* ;
 ALPHA          → "a" ... "z" | "A" ... "Z" | "_" ;
 DIGIT          → "0" ... "9" ;
 ```
+
+</details>
