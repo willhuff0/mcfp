@@ -1,0 +1,4 @@
+import 'math.mcfp';
+
+print abs(24);
+print abs(24 - 212);

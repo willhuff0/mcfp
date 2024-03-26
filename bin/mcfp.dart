@@ -4,8 +4,10 @@ import 'package:mcfp/compiler.dart';
 import 'package:mcfp/lexer.dart';
 import 'package:mcfp/parser.dart';
 
+import 'package:mcfp/_paths.dart' as paths;
+
 void main(List<String> arguments) async {
-  const scriptName = 'fib';
+  const scriptName = 'test';
 
   final input = File('scripts/$scriptName.mcfp').readAsStringSync();
 
@@ -17,5 +19,5 @@ void main(List<String> arguments) async {
 
   final compiler = Compiler(rootPath: 'scripts', rootEnvName: scriptName);
   compiler.compile(statements);
-  compiler.writeToDir('out');
+  compiler.writeToDir(paths.outPath);
 }

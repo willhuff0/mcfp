@@ -1,10 +1,11 @@
-// Prints to chat the Fibonacci sequence up to n = 44, 701408733
+// Prints to chat the Fibonacci sequence up to n = 25, 46368
 
 var a = 0;
-var temp;
+var b = 1;
 
-for(var b = 1; a < 1000000000; b = temp + b) {
-  print a;
-  temp = a;
+for (var n = 0; n < 25; n = n + 1) {
+  var temp = a;
   a = b;
+  b = temp + b;
+  print temp;
 }

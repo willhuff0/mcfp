@@ -75,12 +75,26 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
   }
 
   void writeToDir(String path) {
+    if (_debug) {
+      _globalEnv.cleanAllVars();
+      if (_pretty) {
+        _globalEnv.comment('RUNTIME CLEAN');
+      }
+      _globalEnv.lines.add('scoreboard players reset neg_one mcfp_runtime');
+      _globalEnv.lines.add('scoreboard players reset return_value mcfp_runtime');
+      _globalEnv.lines.add('scoreboard players reset should_break mcfp_runtime');
+    } else {
+      if (_pretty) {
+        _globalEnv.comment('RUNTIME CLEAN');
+      }
+      _globalEnv.lines.add('scoreboard objectives remove mcfp_runtime');
+    }
+
     final dir = Directory(path);
     if (dir.existsSync()) {
       dir.deleteSync(recursive: true);
     }
     dir.createSync(recursive: true);
-    _globalEnv.cleanAllVars();
     _globalEnv.writeToDir(path);
   }
 
@@ -124,7 +138,7 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
         _ifBranch(condition.name!, false, elseBranch);
       }
 
-      if (condition.isTemp) env.undefineAndReset(condition.name!);
+      if (condition.isTemp) env.reset(condition.name!);
     } else {
       if (condition.value == 1) {
         _ifBranch(null, true, stmt.thenBranch);
@@ -161,12 +175,12 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
 
     final value = _evaluate(stmt.expression);
     if (value is CompiledStringExpr) {
-      env.lines.add('tellraw @a "MCFP: ${value.stringValue}"');
+      env.lines.add('tellraw @a "${_globalEnv.name}: ${value.stringValue}"');
     } else {
       if (value.value == null) {
         final json = jsonEncode([
           {
-            'text': 'MCFP: ',
+            'text': '${_globalEnv.name}: ',
           },
           {
             'score': {
@@ -179,7 +193,7 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
 
         if (value.isTemp) env.undefineAndReset(value.name!);
       } else {
-        env.lines.add('tellraw @a "MCFP: ${value.value}"');
+        env.lines.add('tellraw @a "${_globalEnv.name}: ${value.value}"');
       }
     }
   }
@@ -272,7 +286,7 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
       final conditionPart = 'execute if score ${env.evalShallow(condition.name!)} mcfp_runtime matches 1 run ';
       env.lines.add('${conditionPart}execute if function $_mcNamespace:${env.evalShallow(bodyName)} run return 1');
 
-      if (condition.isTemp) env.undefineAndReset(condition.name!);
+      if (condition.isTemp) env.reset(condition.name!);
     } else {
       if (condition.value == 1) {
         final body = stmt.body;
@@ -302,7 +316,7 @@ class Compiler implements ast_expr.Visitor<CompiledExpr>, ast_stmt.Visitor<void>
       final conditionPart = 'execute if score ${env.evalShallow(condition.name!)} mcfp_runtime matches 1 run ';
       env.lines.add('${conditionPart}execute if function $_mcNamespace:${stmt.funcName} run return 1');
 
-      if (condition.isTemp) env.undefineAndReset(condition.name!);
+      if (condition.isTemp) env.reset(condition.name!);
     } else {
       env.lines.add('execute if score should_break mcfp_runtime matches 1 run return 0');
       env.lines.add('execute if function $_mcNamespace:${stmt.funcName} run return 1');
@@ -763,8 +777,12 @@ class Environment {
     _vars.remove(name);
   }
 
-  void undefineAndReset(String name) {
+  void reset(String name) {
     lines.add('scoreboard players reset ${evalShallow(name)} mcfp_runtime');
+  }
+
+  void undefineAndReset(String name) {
+    reset(name);
     undefine(name);
   }
 
@@ -799,11 +817,15 @@ class Environment {
     if (_pretty && _vars.isNotEmpty) {
       comment('CLEAN');
     }
-    for (final variable in _vars) {
-      lines.add('scoreboard players reset $namespace$variable mcfp_runtime');
-    }
+    _cleanAllVars(this);
     for (final enclosed in _enclosed) {
-      enclosed.cleanAllVars();
+      enclosed._cleanAllVars(this);
+    }
+  }
+
+  void _cleanAllVars(Environment top) {
+    for (final variable in _vars) {
+      top.lines.add('scoreboard players reset $namespace$variable mcfp_runtime');
     }
   }
 

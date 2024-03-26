@@ -1,0 +1,16 @@
+func abs(x) {
+    if (x < 0) return -x;
+    else return x;
+}
+
+// Sqrt doesn't work at all without decimals :(
+// If I ever implement fixed point decimal numbers this function will work
+
+var sqrtPrecision = 1;
+func sqrt(x) {
+    var z = 1;
+    while (abs(x - z*z) > sqrtPrecision) {
+        z = z - (z*z - x) / (2*z);
+    }
+    return z;
+}
