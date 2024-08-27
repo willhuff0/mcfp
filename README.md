@@ -142,8 +142,6 @@ Compiled in 10.89 ms with pretty and debug mode on.
 
 ## Language
 
-Grammar is similar to [Lox](https://craftinginterpreters.com/the-lox-language.html).
-
 <details>
   <summary>Syntax</summary>
 
